@@ -1,8 +1,7 @@
 /**
  * Copyright (c) 2026 Ujjwal Kumar Bhowmick
- * - Developer: Ujjwal Kumar Bhowmick
- * - Email: ujjwalkumarbhowmick30@gmail.com
- * - All rights reserved.
+ * Developer: Ujjwal Kumar Bhowmick (ujjwalkumarbhowmick30@gmail.com)
+ * All rights reserved.
  * 
  * Theme Ideation & Creative Content Engine for CelebraTech AI
  * Generates personalized aesthetic themes, color palettes, invitations, and custom event speeches.
@@ -204,3 +203,4 @@ export class ThemeIdeator {
     }
   }
 }
+

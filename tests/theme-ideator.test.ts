@@ -1,8 +1,7 @@
 /**
  * Copyright (c) 2026 Ujjwal Kumar Bhowmick
- * - Developer: Ujjwal Kumar Bhowmick
- * - Email: ujjwalkumarbhowmick30@gmail.com
- * - All rights reserved.
+ * Developer: Ujjwal Kumar Bhowmick (ujjwalkumarbhowmick30@gmail.com)
+ * All rights reserved.
  */
 
 import { describe, it, expect } from 'vitest';

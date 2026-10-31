@@ -1,8 +1,7 @@
 /**
  * Copyright (c) 2026 Ujjwal Kumar Bhowmick
- * - Developer: Ujjwal Kumar Bhowmick
- * - Email: ujjwalkumarbhowmick30@gmail.com
- * - All rights reserved.
+ * Developer: Ujjwal Kumar Bhowmick (ujjwalkumarbhowmick30@gmail.com)
+ * All rights reserved.
  * 
  * Safety & Guardrails Engine for CelebraTech AI
  * Enforces PII redaction, prompt injection defense, and input boundary validation.
@@ -169,3 +168,4 @@ export class SafetyGuardrails {
     };
   }
 }
+

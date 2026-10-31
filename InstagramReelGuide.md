@@ -3,8 +3,7 @@
 **Challenge:** [Challenge 5] Celebration & Event Planner  
 **Project:** CelebraTech AI (GenAI-Powered Celebration & Event Planning Assistant)  
 **Repository:** [https://github.com/ujju2020/Celebration_Event-Planner.git](https://github.com/ujju2020/Celebration_Event-Planner.git)  
-**Developer:** Ujjwal Kumar Bhowmick  
-**Email:** ujjwalkumarbhowmick30@gmail.com  
+**Developer:** Ujjwal Kumar Bhowmick (ujjwalkumarbhowmick30@gmail.com)  
 **Copyright:** (c) 2026 Ujjwal Kumar Bhowmick. All rights reserved.  
 
 ---
@@ -64,3 +63,4 @@ Check out the full open-source code and live prototype on GitHub! 💻 Link in b
 3. [ ] Burn in auto-captions for high retention (many users watch without audio).
 4. [ ] Post to Instagram with the caption and hashtags above.
 5. [ ] Copy the public Instagram Reel URL and keep it ready for your challenge submission form.
+

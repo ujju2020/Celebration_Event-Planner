@@ -1,8 +1,7 @@
 /**
  * Copyright (c) 2026 Ujjwal Kumar Bhowmick
- * - Developer: Ujjwal Kumar Bhowmick
- * - Email: ujjwalkumarbhowmick30@gmail.com
- * - All rights reserved.
+ * Developer: Ujjwal Kumar Bhowmick (ujjwalkumarbhowmick30@gmail.com)
+ * All rights reserved.
  * 
  * Domain Type Definitions for CelebraTech AI (GenAI Celebration & Event Planner)
  */
@@ -160,3 +159,4 @@ export interface PlannerDossier {
   theme: ThematicConcept;
   safetyAudit: SafetyAudit;
 }
+

@@ -3,8 +3,7 @@
 **Challenge:** [Challenge 5] Celebration & Event Planner  
 **Project:** CelebraTech AI (GenAI-Powered Celebration & Event Planning Assistant)  
 **Repository:** [https://github.com/ujju2020/Celebration_Event-Planner.git](https://github.com/ujju2020/Celebration_Event-Planner.git)  
-**Developer:** Ujjwal Kumar Bhowmick  
-**Email:** ujjwalkumarbhowmick30@gmail.com  
+**Developer:** Ujjwal Kumar Bhowmick (ujjwalkumarbhowmick30@gmail.com)  
 **Copyright:** (c) 2026 Ujjwal Kumar Bhowmick. All rights reserved.  
 
 ---
@@ -72,3 +71,4 @@ Per the competition instructions in `README.md`:
 - [ ] Record in 1080p landscape (1920x1080) at 30 or 60 fps using OBS or Loom.
 - [ ] Upload to YouTube as Unlisted/Public or Loom/Google Drive.
 - [ ] Test that the video link can be opened in an Incognito window without requiring login permissions.
+

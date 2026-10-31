@@ -2,8 +2,7 @@
 
 **Challenge:** [Challenge 5] Celebration & Event Planner  
 **Repository:** [https://github.com/ujju2020/Celebration_Event-Planner.git](https://github.com/ujju2020/Celebration_Event-Planner.git)  
-**Developer:** Ujjwal Kumar Bhowmick  
-**Email:** ujjwalkumarbhowmick30@gmail.com  
+**Developer:** Ujjwal Kumar Bhowmick (ujjwalkumarbhowmick30@gmail.com)  
 **Copyright:** (c) 2026 Ujjwal Kumar Bhowmick. All rights reserved.  
 
 ---
@@ -178,3 +177,4 @@ graph TD
    - Create `VideoSubmissionGuide.md` with the 2-3 minute comprehensive project walkthrough video script.
 6. **Verify, Commit & Push:**
    - Run tests, check repo size, verify single branch `main`, and push cleanly to GitHub remote.
+

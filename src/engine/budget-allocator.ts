@@ -1,8 +1,7 @@
 /**
  * Copyright (c) 2026 Ujjwal Kumar Bhowmick
- * - Developer: Ujjwal Kumar Bhowmick
- * - Email: ujjwalkumarbhowmick30@gmail.com
- * - All rights reserved.
+ * Developer: Ujjwal Kumar Bhowmick (ujjwalkumarbhowmick30@gmail.com)
+ * All rights reserved.
  * 
  * Dynamic Budget Allocator Engine for CelebraTech AI
  * Implements benchmarked allocation models, contingency reserves, and cost-per-guest analytics.
@@ -161,3 +160,4 @@ export class BudgetAllocator {
     return recommendations;
   }
 }
+

@@ -10,8 +10,7 @@
 > Create a GenAI-powered planning assistant that helps users organize weddings, birthdays, and community events with budgets, timelines, vendor checklists, and personalized ideas.
 
 * **Repository:** [https://github.com/ujju2020/Celebration_Event-Planner.git](https://github.com/ujju2020/Celebration_Event-Planner.git)
-* **Developer:** Ujjwal Kumar Bhowmick
-* **Email:** ujjwalkumarbhowmick30@gmail.com
+* **Developer:** Ujjwal Kumar Bhowmick (ujjwalkumarbhowmick30@gmail.com)
 * **Copyright:** (c) 2026 Ujjwal Kumar Bhowmick. All rights reserved.
 
 ---
@@ -238,5 +237,6 @@ npm run build
 ## 📄 License & Attribution
 
 Copyright (c) 2026 Ujjwal Kumar Bhowmick  
+Developer: Ujjwal Kumar Bhowmick (ujjwalkumarbhowmick30@gmail.com)  
 Developed for **PromptWars Challenge 5: Celebration & Event Planner**.  
 Licensed under the [MIT License](LICENSE).

@@ -1,8 +1,7 @@
 /**
  * Copyright (c) 2026 Ujjwal Kumar Bhowmick
- * - Developer: Ujjwal Kumar Bhowmick
- * - Email: ujjwalkumarbhowmick30@gmail.com
- * - All rights reserved.
+ * Developer: Ujjwal Kumar Bhowmick (ujjwalkumarbhowmick30@gmail.com)
+ * All rights reserved.
  * 
  * Interactive Web Application Engine for CelebraTech AI
  */
@@ -698,3 +697,4 @@ document.getElementById('printPlanBtn').addEventListener('click', () => {
 
 // Auto load default preset on start
 loadPreset(PRESETS.wedding);
+

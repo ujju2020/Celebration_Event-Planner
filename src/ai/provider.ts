@@ -1,8 +1,7 @@
 /**
  * Copyright (c) 2026 Ujjwal Kumar Bhowmick
- * - Developer: Ujjwal Kumar Bhowmick
- * - Email: ujjwalkumarbhowmick30@gmail.com
- * - All rights reserved.
+ * Developer: Ujjwal Kumar Bhowmick (ujjwalkumarbhowmick30@gmail.com)
+ * All rights reserved.
  * 
  * Pluggable AI Provider Interface for CelebraTech AI
  * Supports zero-latency deterministic heuristic generation and live LLM integration.
@@ -70,3 +69,4 @@ export class CelebraTechAIProvider {
     return dossier;
   }
 }
+

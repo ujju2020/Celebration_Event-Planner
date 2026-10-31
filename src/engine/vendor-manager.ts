@@ -1,8 +1,7 @@
 /**
  * Copyright (c) 2026 Ujjwal Kumar Bhowmick
- * - Developer: Ujjwal Kumar Bhowmick
- * - Email: ujjwalkumarbhowmick30@gmail.com
- * - All rights reserved.
+ * Developer: Ujjwal Kumar Bhowmick (ujjwalkumarbhowmick30@gmail.com)
+ * All rights reserved.
  * 
  * Vendor Manager & Intelligent RFP Engine for CelebraTech AI
  * Generates category checklists, interview questionnaires, RFP templates, and contract red flags.
@@ -143,3 +142,4 @@ export class VendorManager {
     return list;
   }
 }
+

@@ -1,3 +1,9 @@
+/**
+ * Copyright (c) 2026 Ujjwal Kumar Bhowmick
+ * Developer: Ujjwal Kumar Bhowmick (ujjwalkumarbhowmick30@gmail.com)
+ * All rights reserved.
+ */
+
 import { defineConfig } from 'vitest/config';
 
 export default defineConfig({
