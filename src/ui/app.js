@@ -85,6 +85,22 @@ const chatInput = document.getElementById('chatInput');
 const sendChatBtn = document.getElementById('sendChatBtn');
 const chatHistory = document.getElementById('chatHistory');
 const quickPromptsContainer = document.getElementById('quickPromptsContainer');
+const generateBtn = document.getElementById('generateBtn');
+
+// Toast notification helper
+function showToastNotification(message) {
+  const existing = document.querySelector('.toast-notification');
+  if (existing) existing.remove();
+
+  const toast = document.createElement('div');
+  toast.className = 'toast-notification';
+  toast.innerHTML = `<span>🎉</span> <span>${message}</span>`;
+  document.body.appendChild(toast);
+
+  setTimeout(() => {
+    if (toast.parentNode) toast.remove();
+  }, 3200);
+}
 
 // Initialize default date (90 days in future)
 const defaultDate = new Date();
@@ -130,11 +146,52 @@ document.querySelectorAll('.tab-btn').forEach(btn => {
   });
 });
 
-// Form Submit Handler
-planForm.addEventListener('submit', (e) => {
-  e.preventDefault();
-  generatePlan();
-});
+// Plan Generation Orchestrator with Visual Feedback
+function triggerPlanGeneration() {
+  if (generateBtn) {
+    generateBtn.disabled = true;
+    generateBtn.innerHTML = '<span>⚡ Engineering GenAI Plan...</span>';
+  }
+
+  setTimeout(() => {
+    generatePlan();
+    showToastNotification(`✨ Event Plan generated for "${titleEl.value.trim() || 'Your Event'}"!`);
+
+    // Flash active tab to give unmistakable visual update feedback
+    const activePane = document.querySelector('.tab-pane.active');
+    if (activePane) {
+      activePane.classList.remove('flash-highlight');
+      void activePane.offsetWidth; // Force CSS reflow
+      activePane.classList.add('flash-highlight');
+    }
+
+    if (generateBtn) {
+      generateBtn.disabled = false;
+      generateBtn.innerHTML = '<span>✓ Plan Generated Successfully!</span>';
+      setTimeout(() => {
+        generateBtn.innerHTML = '<span>✨ Generate Full AI Plan</span>';
+      }, 1600);
+    }
+  }, 300);
+}
+
+// Form Submit & Button Click Handlers
+if (planForm) {
+  planForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    triggerPlanGeneration();
+  });
+}
+
+if (generateBtn) {
+  generateBtn.addEventListener('click', (e) => {
+    if (planForm && !planForm.checkValidity()) {
+      return; // Allow native form validation prompts to highlight missing fields
+    }
+    e.preventDefault();
+    triggerPlanGeneration();
+  });
+}
 
 // Copilot Chat Submit
 sendChatBtn.addEventListener('click', handleChatSubmit);
@@ -309,7 +366,11 @@ function calculateBudgetClient(req) {
 }
 
 function generateTimelineClient(req) {
-  const eventDateObj = new Date(req.targetDate);
+  let eventDateObj = new Date(req.targetDate);
+  if (!req.targetDate || isNaN(eventDateObj.getTime())) {
+    eventDateObj = new Date();
+    eventDateObj.setDate(eventDateObj.getDate() + 90);
+  }
   const formatDate = (offset) => {
     const d = new Date(eventDateObj.getTime());
     d.setDate(d.getDate() + offset);
