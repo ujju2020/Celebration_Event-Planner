@@ -23,6 +23,7 @@
     "promptwars"
   ],
   "author": "Ujjwal Kumar Bhowmick <ujjwalkumarbhowmick30@gmail.com>",
+  "copyright": "Copyright (c) 2026 Ujjwal Kumar Bhowmick (ujjwalkumarbhowmick30@gmail.com). All rights reserved.",
   "license": "MIT",
   "devDependencies": {
     "@types/node": "^22.5.4",

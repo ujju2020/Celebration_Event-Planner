@@ -1,3 +1,8 @@
+/**
+ * Copyright (c) 2026 Ujjwal Kumar Bhowmick
+ * Developer: Ujjwal Kumar Bhowmick (ujjwalkumarbhowmick30@gmail.com)
+ * All rights reserved.
+ */
 {
   "compilerOptions": {
     "target": "ES2022",
@@ -18,4 +23,3 @@
   "include": ["src/**/*"],
   "exclude": ["node_modules", "dist", "tests/**/*"]
 }
-
