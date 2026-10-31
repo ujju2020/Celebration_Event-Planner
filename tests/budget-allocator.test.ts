@@ -94,5 +94,26 @@ describe('BudgetAllocator', () => {
     expect(budget.overspendWarnings.length).toBeGreaterThan(0);
     expect(budget.overspendWarnings[0]).toContain('tight for full-scale wedding hospitality');
   });
+
+  it('calculates Indian Rupee (INR) budgets with benchmark Lakh allocations', () => {
+    const request: EventRequest = {
+      eventType: 'wedding',
+      title: 'Grand Palace Wedding Jaipur',
+      totalBudget: 1500000, // ₹15,00,000 (15 Lakhs)
+      currency: 'INR',
+      guestCount: 250,
+      targetDate: '2027-02-15',
+      location: 'Jaipur, Rajasthan',
+      vibe: 'royal_traditional'
+    };
+
+    const budget = BudgetAllocator.calculateBudget(request);
+    expect(budget.currency).toBe('INR');
+    expect(budget.totalBudget).toBe(1500000);
+    expect(budget.costPerGuestTotal).toBe(6000); // ₹6,000 per guest
+    expect(budget.contingencyAmount).toBe(120000); // 8% = ₹1,20,000
+    const catering = budget.items.find(i => i.category === 'Catering & Drinks');
+    expect(catering?.allocatedAmount).toBe(480000); // 32% = ₹4,80,000
+  });
 });
 

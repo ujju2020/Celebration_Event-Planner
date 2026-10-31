@@ -6,40 +6,63 @@
  * Interactive Web Application Engine for CelebraTech AI
  */
 
-// Presets data
+// Helper functions for Indian Rupee and multi-currency formatting
+function getCurrencySymbol(curr) {
+  if (!curr || curr === 'INR') return '₹';
+  if (curr === 'USD') return '$';
+  if (curr === 'EUR') return '€';
+  if (curr === 'GBP') return '£';
+  return curr;
+}
+
+function formatAmount(amount, curr = 'INR') {
+  const sym = getCurrencySymbol(curr);
+  const num = Math.round(Number(amount) || 0);
+  const locale = curr === 'INR' ? 'en-IN' : 'en-US';
+  return `${sym} ${num.toLocaleString(locale)}`;
+}
+
+function formatDecimalAmount(amount, curr = 'INR') {
+  const sym = getCurrencySymbol(curr);
+  const num = Number(amount) || 0;
+  const locale = curr === 'INR' ? 'en-IN' : 'en-US';
+  return `${sym} ${num.toLocaleString(locale, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+}
+
+// Presets data (All benchmarked in Indian Rupees)
 const PRESETS = {
   wedding: {
     eventType: 'wedding',
     title: 'Grand Heritage Royal Wedding',
-    totalBudget: 45000,
-    currency: 'USD',
-    guestCount: 200,
+    totalBudget: 1500000, // ₹15,00,000 (15 Lakhs)
+    currency: 'INR',
+    guestCount: 250,
     targetDate: '2027-05-15',
     location: 'Palace Heritage Courtyard, Jaipur',
     vibe: 'royal_traditional',
-    customVibeNotes: 'Seeking royal heritage ambiance, multi-generational family hospitality, and candlelit courtyard banquet.'
+    customVibeNotes: 'Seeking royal Rajasthani heritage ambiance, multi-generational family hospitality, and candlelit courtyard banquet.'
   },
   birthday: {
     eventType: 'birthday',
     title: '30th Milestone Retro Glam Party',
-    totalBudget: 6000,
-    currency: 'USD',
+    totalBudget: 250000, // ₹2,50,000 (2.5 Lakhs)
+    currency: 'INR',
     guestCount: 60,
     targetDate: '2026-11-28',
-    location: 'Skyline Penthouse Lounge',
+    location: 'Skyline Penthouse Lounge, Mumbai',
     vibe: 'retro_vintage',
-    customVibeNotes: 'Speakeasy cocktail lounge vibe, live DJ, interactive polaroid wall, and golden era playlist.'
+    customVibeNotes: 'Speakeasy cocktail lounge vibe, live Bollywood-Retro DJ, interactive polaroid wall, and golden era playlist.'
   },
   community: {
     eventType: 'community',
-    title: 'Downtown Spring Cultural & Food Fest',
-    totalBudget: 35000,
-    currency: 'USD',
+    title: 'Cultural Arts & Food Festival',
+    totalBudget: 800000, // ₹8,00,000 (8 Lakhs)
+    currency: 'INR',
     guestCount: 1200,
     targetDate: '2027-04-18',
-    location: 'Central Waterfront Promenade',
+    location: 'Central Waterfront Promenade, Bengaluru',
     vibe: 'festive_carnival',
-    customVibeNotes: 'Family-friendly cultural performances, street food trucks, artisan stalls, and waste-reduction recycling stations.'
+    customVibeNotes: 'Family-friendly cultural performances, street food stalls, artisan booths, and waste-reduction recycling stations.'
   }
 };
 
@@ -166,9 +189,9 @@ function generatePlan() {
   const request = {
     eventType: eventTypeEl.value,
     title: titleEl.value.trim() || 'Signature Celebration',
-    totalBudget: parseFloat(totalBudgetEl.value) || 10000,
-    currency: currencyEl.value,
-    guestCount: parseInt(guestCountEl.value, 10) || 50,
+    totalBudget: parseFloat(totalBudgetEl.value) || 1500000,
+    currency: currencyEl.value || 'INR',
+    guestCount: parseInt(guestCountEl.value, 10) || 100,
     targetDate: targetDateEl.value,
     location: locationEl.value.trim() || 'Central Venue',
     vibe: vibeEl.value,
@@ -444,7 +467,7 @@ function processCopilotQuery(q) {
     const newCount = parseInt(countMatch[1], 10);
     const newPerGuest = (activeDossier.request.totalBudget / newCount).toFixed(2);
     return {
-      answer: `Adjusting for **${newCount} guests**: Your revised spending power is **${activeDossier.request.currency} ${newPerGuest} per guest**. We recommend shifting 5% from floral decor into dining buffets to maintain generous food portions.`,
+      answer: `Adjusting for **${newCount} guests**: Your revised spending power is **${formatDecimalAmount(newPerGuest, activeDossier.request.currency)} per guest**. We recommend shifting 5% from floral decor into dining buffets to maintain generous food portions.`,
       suggestedFollowUps: ['How to negotiate with caterer?', 'Show updated seating layout', 'What about extra drinks?'],
       updatedBudgetSnippet: { newCount }
     };
@@ -452,8 +475,13 @@ function processCopilotQuery(q) {
 
   // Cost cutting
   if (lower.includes('save') || lower.includes('cut') || lower.includes('budget') || lower.includes('reduce')) {
+    const curr = activeDossier ? activeDossier.request.currency : 'INR';
     return {
-      answer: `Here are 3 tested ways to save 15-20% on your celebration:\n1. **Friday / Sunday Venue Booking:** Saves 15-25% over prime Saturday nights.\n2. **Action Buffet Food Stations:** Lowers catering staffing overhead by 20% compared to plated dining.\n3. **Repurpose Floral Arches:** Move ceremony flower arches to the evening reception backdrop.`,
+      answer: `Here are 4 tested ways to save 15-20% on your celebration in Indian context:\n` +
+        `1. **Off-Peak Venue Booking:** Booking on a Friday or Sunday daytime saves 15-25% over peak Saturday nights.\n` +
+        `2. **Buffet Food Stations:** Lowers catering staffing overhead by 20% compared to formal sit-down table service.\n` +
+        `3. **Repurpose Mandap & Stage Florals:** Relocate morning floral arches to evening reception backdrops.\n` +
+        `4. **Digital Invites with RSVP:** Save up to ${formatAmount(curr === 'INR' ? 40000 : 800, curr)} on physical card printing, box hampers, and courier postage.`,
       suggestedFollowUps: ['What costs are non-negotiable?', 'How much contingency buffer should I keep?']
     };
   }
@@ -461,7 +489,7 @@ function processCopilotQuery(q) {
   // Rain / Weather
   if (lower.includes('rain') || lower.includes('weather') || lower.includes('outdoor')) {
     return {
-      answer: `**Weather Plan B Checklist:**\n1. Reserve clear marquee tents with roll-down sidewalls 14 days prior.\n2. Elevate all sound electronics and mixers on wooden subflooring with GFCI breakers.\n3. Keep 50 branded umbrellas at the welcome greeting table for arriving guests.`,
+      answer: `**Weather Plan B Checklist:**\n1. Reserve clear waterproof marquee tents with roll-down sidewalls 14 days prior.\n2. Elevate all sound electronics and mixers on wooden subflooring with circuit breakers.\n3. Keep 50 branded umbrellas at the welcome greeting table for arriving guests.`,
       suggestedFollowUps: ['When is the cancellation deadline for tents?', 'Show indoor photo spot ideas']
     };
   }
@@ -474,8 +502,10 @@ function processCopilotQuery(q) {
     };
   }
 
+  const curr = activeDossier ? activeDossier.request.currency : 'INR';
+  const totalStr = activeDossier ? formatAmount(activeDossier.request.totalBudget, curr) : 'your event';
   return {
-    answer: `I am monitoring your event plan for **${activeDossier ? activeDossier.request.title : 'your event'}**. You can ask me to rebalance budgets for new headcounts, negotiate vendor RFPs, or generate custom celebration toasts!`,
+    answer: `I am monitoring your event plan for **${activeDossier ? activeDossier.request.title : 'your event'}** with a budget of **${totalStr}**. You can ask me to rebalance budgets for new headcounts, negotiate vendor RFPs, or generate custom celebration toasts!`,
     suggestedFollowUps: ['How to save 15% on catering?', 'Show Day-Of Run of Show', 'What contract traps should I avoid?']
   };
 }
@@ -491,15 +521,16 @@ function renderAllTabs(dossier) {
 
 function renderOverviewTab(d) {
   const container = document.getElementById('tabOverview');
+  const curr = d.request.currency;
   container.innerHTML = `
     <div class="metrics-row">
       <div class="metric-card">
         <div class="metric-label">Total Budget</div>
-        <div class="metric-value">${d.request.currency} ${d.budget.totalBudget.toLocaleString()}</div>
+        <div class="metric-value">${formatAmount(d.budget.totalBudget, curr)}</div>
       </div>
       <div class="metric-card">
         <div class="metric-label">Cost Per Guest</div>
-        <div class="metric-value">${d.request.currency} ${d.budget.costPerGuestTotal}</div>
+        <div class="metric-value">${formatDecimalAmount(d.budget.costPerGuestTotal, curr)}</div>
       </div>
       <div class="metric-card">
         <div class="metric-label">Milestones</div>
@@ -507,7 +538,7 @@ function renderOverviewTab(d) {
       </div>
       <div class="metric-card">
         <div class="metric-label">Safety Contingency</div>
-        <div class="metric-value" style="color: #34d399">${d.budget.contingencyPercentage}% (${d.request.currency} ${d.budget.contingencyAmount.toLocaleString()})</div>
+        <div class="metric-value" style="color: #34d399">${d.budget.contingencyPercentage}% (${formatAmount(d.budget.contingencyAmount, curr)})</div>
       </div>
     </div>
 
@@ -529,6 +560,7 @@ function renderOverviewTab(d) {
 
 function renderBudgetTab(d) {
   const container = document.getElementById('tabBudget');
+  const curr = d.request.currency;
   let tableRows = d.budget.items.map(item => `
     <tr>
       <td><strong>${item.category}</strong><br><small style="color: var(--text-muted);">${item.name}</small></td>
@@ -536,8 +568,8 @@ function renderBudgetTab(d) {
       <td>${item.percentage}%
         <div class="progress-bar-container"><div class="progress-bar-fill" style="width: ${item.percentage * 2.5}%"></div></div>
       </td>
-      <td><strong>${d.request.currency} ${item.allocatedAmount.toLocaleString()}</strong></td>
-      <td style="color: var(--text-muted);">${d.request.currency} ${item.costPerGuest}</td>
+      <td><strong>${formatAmount(item.allocatedAmount, curr)}</strong></td>
+      <td style="color: var(--text-muted);">${formatDecimalAmount(item.costPerGuest, curr)}</td>
     </tr>
   `).join('');
 

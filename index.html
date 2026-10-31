@@ -39,9 +39,9 @@
     <!-- Quick Presets Bar -->
     <div class="preset-bar">
       <span class="preset-label">⚡ 1-Click Demo Presets:</span>
-      <button class="preset-btn" data-preset="wedding">💍 Grand Royal Wedding (Jaipur)</button>
-      <button class="preset-btn" data-preset="birthday">🎂 30th Milestone Birthday (Penthouse)</button>
-      <button class="preset-btn" data-preset="community">🎪 Community Cultural Food Fest</button>
+      <button class="preset-btn" data-preset="wedding">💍 Grand Royal Wedding (Jaipur - ₹15 Lakhs)</button>
+      <button class="preset-btn" data-preset="birthday">🎂 30th Milestone Birthday (Mumbai - ₹2.5 Lakhs)</button>
+      <button class="preset-btn" data-preset="community">🎪 Cultural Food Fest (Bengaluru - ₹8 Lakhs)</button>
       <div style="margin-left: auto; display: flex; gap: 8px;">
         <button class="preset-btn" id="printPlanBtn">🖨️ Printable Dossier</button>
         <button class="preset-btn" id="exportJsonBtn">💾 Export JSON</button>
@@ -76,8 +76,8 @@
             <div class="form-group">
               <label class="form-label" for="currency">Currency</label>
               <select class="form-select" id="currency">
+                <option value="INR" selected>INR (₹) - Indian Rupee</option>
                 <option value="USD">USD ($)</option>
-                <option value="INR">INR (₹)</option>
                 <option value="EUR">EUR (€)</option>
                 <option value="GBP">GBP (£)</option>
               </select>

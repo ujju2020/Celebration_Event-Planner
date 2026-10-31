@@ -86,13 +86,15 @@ export class BudgetAllocator {
     // Cost per guest total
     const costPerGuestTotal = parseFloat((totalBudget / guestCount).toFixed(2));
 
+    const currency = request.currency || 'INR';
+
     // Intelligence: Analyze warnings and savings
-    const overspendWarnings = this.generateWarnings(request.eventType, totalBudget, guestCount, items);
+    const overspendWarnings = this.generateWarnings(request.eventType, totalBudget, guestCount, items, currency);
     const savingsRecommendations = this.generateSavings(request.eventType, items);
 
     return {
       totalBudget,
-      currency: request.currency || 'USD',
+      currency,
       guestCount,
       contingencyAmount,
       contingencyPercentage,
@@ -121,17 +123,21 @@ export class BudgetAllocator {
     eventType: EventType,
     totalBudget: number,
     guestCount: number,
-    items: BudgetItem[]
+    items: BudgetItem[],
+    currency: string = 'INR'
   ): string[] {
     const warnings: string[] = [];
     const perGuest = totalBudget / guestCount;
+    const sym = currency === 'INR' ? '₹' : currency === 'USD' ? '$' : currency;
+    const weddingMin = currency === 'INR' ? 1000 : 50;
+    const birthdayMin = currency === 'INR' ? 400 : 20;
 
-    if (eventType === 'wedding' && perGuest < 50) {
-      warnings.push(`High Alert: Total budget of ${perGuest.toFixed(1)}/guest is extremely tight for full-scale wedding hospitality.`);
+    if (eventType === 'wedding' && perGuest < weddingMin) {
+      warnings.push(`High Alert: Total budget of ${sym} ${perGuest.toFixed(1)}/guest is extremely tight for full-scale wedding hospitality.`);
     }
 
-    if (eventType === 'birthday' && perGuest < 20) {
-      warnings.push(`Budget Warning: ${perGuest.toFixed(1)}/guest may require finger foods rather than a plated banquet.`);
+    if (eventType === 'birthday' && perGuest < birthdayMin) {
+      warnings.push(`Budget Warning: ${sym} ${perGuest.toFixed(1)}/guest may require finger foods rather than a plated banquet.`);
     }
 
     // Check catering proportion

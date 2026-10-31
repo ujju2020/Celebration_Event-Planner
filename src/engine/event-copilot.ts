@@ -28,6 +28,10 @@ export class EventCopilot {
   public static processQuery(query: string, dossier: PlannerDossier): CopilotResponse {
     const q = query.toLowerCase();
 
+    const currency = dossier.request.currency || 'INR';
+    const sym = currency === 'INR' ? '₹' : currency === 'USD' ? '$' : currency;
+    const locale = currency === 'INR' ? 'en-IN' : 'en-US';
+
     // 1. Guest count change
     const guestMatch = q.match(/(?:guest(?:s)?\s*(?:count|list)?|headcount|people)\s*(?:increased|grew|decreased|to|by|expanded|is|are)?\s*(?:to|by)?\s*(\d+)/i) ||
                        q.match(/(\d+)\s+guests/i);
@@ -39,8 +43,8 @@ export class EventCopilot {
         const diff = projectedPerGuest - currentPerGuest;
 
         const advice = diff < 0
-          ? `Increasing guest count from ${dossier.request.guestCount} to ${newCount} compresses your spending power to ${dossier.request.currency} ${projectedPerGuest}/guest (a decrease of ${Math.abs(diff).toFixed(2)}/guest). To accommodate this, we recommend shifting 5-8% from decor and printed stationery into catering, or opting for family-style/buffet dining rather than plated service.`
-          : `Decreasing guest count to ${newCount} frees up spending room to ${dossier.request.currency} ${projectedPerGuest}/guest (an increase of ${diff.toFixed(2)}/guest). You can upgrade your catering menu tiers or enhance live musical entertainment!`;
+          ? `Increasing guest count from ${dossier.request.guestCount} to ${newCount} compresses your spending power to ${sym} ${projectedPerGuest}/guest (a decrease of ${Math.abs(diff).toFixed(2)}/guest). To accommodate this, we recommend shifting 5-8% from decor and printed stationery into catering, or opting for family-style/buffet dining rather than plated service.`
+          : `Decreasing guest count to ${newCount} frees up spending room to ${sym} ${projectedPerGuest}/guest (an increase of ${diff.toFixed(2)}/guest). You can upgrade your catering menu tiers or enhance live musical entertainment!`;
 
         return {
           answer: advice,
@@ -60,12 +64,13 @@ export class EventCopilot {
 
     // 2. Budget cuts and savings
     if (q.includes('save') || q.includes('cut budget') || q.includes('reduce cost') || q.includes('cheap') || q.includes('discount')) {
+      const savingsStr = currency === 'INR' ? '₹40,000–₹1,20,000' : '$500–$1,500';
       return {
         answer: `Here are 4 high-impact ways to optimize your ${dossier.request.eventType} budget without sacrificing quality:\n` +
           `1. **Venue Timing:** Booking on Friday evening or Sunday afternoon usually secures 15-20% discounts compared to Saturday primes.\n` +
           `2. **Catering Strategy:** Switch from a 5-course plated banquet to elevated action food stations or buffet, which reduces staffing overhead by ~25%.\n` +
           `3. **Floral Repurposing:** Have your coordinator relocate ceremony floral arches to the reception photo booth and sweetheart table.\n` +
-          `4. **Digital Invites & RSVP:** Save up to $500–$1,500 on fine stationery printing and international postage by using digital invitations with automated RSVP tracking.`,
+          `4. **Digital Invites & RSVP:** Save up to ${savingsStr} on fine stationery printing and courier postage by using digital invitations with automated RSVP tracking.`,
         suggestedAction: 'Apply 15% budget reduction across optional categories',
         suggestedFollowUps: [
           'What are non-negotiable essential costs?',
@@ -128,7 +133,7 @@ export class EventCopilot {
     // Default general advice
     return {
       answer: `I've analyzed your event setup for "${dossier.request.title}" (${dossier.request.eventType.toUpperCase()}) in ${dossier.request.location}. ` +
-        `Your budget of ${dossier.request.currency} ${dossier.request.totalBudget.toLocaleString()} is balanced across ${dossier.budget.items.length} key categories with a ${dossier.budget.contingencyPercentage}% safety cushion. ` +
+        `Your budget of ${sym} ${dossier.request.totalBudget.toLocaleString(locale)} is balanced across ${dossier.budget.items.length} key categories with a ${dossier.budget.contingencyPercentage}% safety cushion. ` +
         `We have mapped ${dossier.timeline.totalTasks} milestone tasks with ${dossier.timeline.criticalPathCount} critical path deadlines. How would you like to refine the plan today?`,
       suggestedFollowUps: [
         'How can we optimize our budget?',
