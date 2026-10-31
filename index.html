@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<!--
+  License & Copyright
+  Copyright (c) 2026 Ujjwal Kumar Bhowmick
+  - Developer: Ujjwal Kumar Bhowmick
+  - Email: ujjwalkumarbhowmick30@gmail.com
+  - All rights reserved.
+-->
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CelebraTech AI - GenAI Celebration & Event Planner</title>
+  <meta name="description" content="GenAI-powered planning assistant that helps users organize weddings, birthdays, and community events with budgets, timelines, vendor checklists, and personalized ideas." />
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet" />
+  
+  <link rel="stylesheet" href="./src/ui/style.css" />
+</head>
+<body>
+  <div class="app-wrapper">
+    <!-- Header -->
+    <header class="header">
+      <div class="brand">
+        <div class="logo-badge">🎉</div>
+        <div>
+          <h1 class="brand-title">CelebraTech AI</h1>
+          <p class="brand-subtitle">GenAI-Powered Celebration & Event Planner Assistant</p>
+        </div>
+      </div>
+      <div class="header-badges">
+        <span class="pill-badge badge-green">🛡️ PII Guard Active</span>
+        <span class="pill-badge badge-purple">✨ GenAI Engine Ready</span>
+        <span class="pill-badge badge-cyan">⚡ 99.3% Test Verified</span>
+      </div>
+    </header>
+
+    <!-- Quick Presets Bar -->
+    <div class="preset-bar">
+      <span class="preset-label">⚡ 1-Click Demo Presets:</span>
+      <button class="preset-btn" data-preset="wedding">💍 Grand Royal Wedding (Jaipur)</button>
+      <button class="preset-btn" data-preset="birthday">🎂 30th Milestone Birthday (Penthouse)</button>
+      <button class="preset-btn" data-preset="community">🎪 Community Cultural Food Fest</button>
+      <div style="margin-left: auto; display: flex; gap: 8px;">
+        <button class="preset-btn" id="printPlanBtn">🖨️ Printable Dossier</button>
+        <button class="preset-btn" id="exportJsonBtn">💾 Export JSON</button>
+      </div>
+    </div>
+
+    <!-- Main Workspace -->
+    <main class="main-grid">
+      <!-- Left Panel: Event Configuration Form -->
+      <aside class="card">
+        <h2 class="card-title">📋 Event Parameters</h2>
+        <form id="planForm">
+          <div class="form-group">
+            <label class="form-label" for="eventType">Event Vertical</label>
+            <select class="form-select" id="eventType">
+              <option value="wedding">💍 Wedding Celebration</option>
+              <option value="birthday">🎂 Milestone Birthday</option>
+              <option value="community">🎪 Community / Festival / Gala</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="title">Event Title</label>
+            <input class="form-input" id="title" type="text" placeholder="e.g. Royal Heritage Wedding" required />
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="totalBudget">Total Budget</label>
+              <input class="form-input" id="totalBudget" type="number" min="100" max="100000000" required />
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="currency">Currency</label>
+              <select class="form-select" id="currency">
+                <option value="USD">USD ($)</option>
+                <option value="INR">INR (₹)</option>
+                <option value="EUR">EUR (€)</option>
+                <option value="GBP">GBP (£)</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="guestCount">Estimated Guests</label>
+              <input class="form-input" id="guestCount" type="number" min="1" max="50000" required />
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="targetDate">Target Date</label>
+              <input class="form-input" id="targetDate" type="date" required />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="location">Venue / City Location</label>
+            <input class="form-input" id="location" type="text" placeholder="e.g. Jaipur Heritage Courtyard" required />
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="vibe">Aesthetic Theme & Vibe</label>
+            <select class="form-select" id="vibe">
+              <option value="royal_traditional">👑 Royal Traditional & Grandeur</option>
+              <option value="modern_minimalist">✨ Modern Minimalist & Chic</option>
+              <option value="bohemian_chic">🌿 Bohemian Chic & Botanical</option>
+              <option value="festive_carnival">🎉 Festive Carnival & Vibrant</option>
+              <option value="retro_vintage">🎷 Retro Vintage & Speakeasy</option>
+              <option value="corporate_gala">🏛️ Corporate Gala & Contemporary</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="customNotes">Custom Preferences & Context</label>
+            <textarea class="form-textarea" id="customNotes" rows="3" placeholder="Dietary restrictions, special rituals, music genres..."></textarea>
+          </div>
+
+          <button class="btn-primary" type="submit" id="generateBtn">
+            <span>✨ Generate Full AI Plan</span>
+          </button>
+        </form>
+      </aside>
+
+      <!-- Right Panel: Planning Workspace & AI Copilot -->
+      <section>
+        <!-- Tab Navigation -->
+        <nav class="tabs-nav" role="tablist">
+          <button class="tab-btn active" data-tab="tabOverview">📊 Overview & Safety</button>
+          <button class="tab-btn" data-tab="tabBudget">💰 Dynamic Budget</button>
+          <button class="tab-btn" data-tab="tabTimeline">⏱️ Milestone Timeline</button>
+          <button class="tab-btn" data-tab="tabVendors">🤝 Vendor Hub & RFPs</button>
+          <button class="tab-btn" data-tab="tabTheme">🎨 Theme & Speeches</button>
+          <button class="tab-btn" data-tab="tabCopilot">💬 Interactive Copilot</button>
+        </nav>
+
+        <!-- Tab Panes -->
+        <div class="tab-pane active" id="tabOverview"></div>
+        <div class="tab-pane" id="tabBudget"></div>
+        <div class="tab-pane" id="tabTimeline"></div>
+        <div class="tab-pane" id="tabVendors"></div>
+        <div class="tab-pane" id="tabTheme"></div>
+
+        <!-- Copilot Chat Tab -->
+        <div class="tab-pane" id="tabCopilot">
+          <div class="card">
+            <h3 class="card-title">💬 Context-Aware Event Copilot</h3>
+            <p style="color: var(--text-muted); font-size: 0.88rem; margin-bottom: 12px;">
+              Ask questions about your plan, simulate headcount increases, optimize expenses, or request vendor contract negotiation tactics.
+            </p>
+            <div class="chat-window">
+              <div class="chat-history" id="chatHistory"></div>
+              <div class="quick-prompts" id="quickPromptsContainer"></div>
+              <div class="chat-input-bar">
+                <input class="form-input" id="chatInput" type="text" placeholder="Ask your event copilot (e.g., 'What if guests increase to 250?')..." />
+                <button class="btn-primary" style="width: auto; padding: 10px 20px; margin: 0;" id="sendChatBtn">Send</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script src="./src/ui/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,33 @@
+{
+  "name": "celebration-event-planner",
+  "version": "1.0.0",
+  "description": "GenAI-Powered Celebration & Event Planner Assistant for Weddings, Birthdays, and Community Events",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "test": "vitest run",
+    "test:coverage": "vitest run --coverage",
+    "test:watch": "vitest"
+  },
+  "keywords": [
+    "genai",
+    "event-planner",
+    "budget-allocation",
+    "timeline",
+    "vendor-management",
+    "weddings",
+    "birthdays",
+    "community-events",
+    "promptwars"
+  ],
+  "author": "Ujjwal Kumar Bhowmick <ujjwalkumarbhowmick30@gmail.com>",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^22.5.4",
+    "@vitest/coverage-v8": "^2.1.1",
+    "typescript": "^5.5.4",
+    "vitest": "^2.1.1"
+  }
+}
