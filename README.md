@@ -2,7 +2,7 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.5-blue.svg)](https://www.typescriptlang.org/)
-[![Tests](https://img.shields.io/badge/Vitest-41%20Passed-brightgreen.svg)](https://vitest.dev/)
+[![Tests](https://img.shields.io/badge/Vitest-46%20Passed-brightgreen.svg)](https://vitest.dev/)
 [![Coverage](https://img.shields.io/badge/Coverage-100%25%20Lines-success.svg)](https://vitest.dev/)
 [![Efficiency](https://img.shields.io/badge/Latency-%3C%200.05ms%20O(1)-orange.svg)](#5-architectural-design-patterns--computational-efficiency)
 [![Repo Size](https://img.shields.io/badge/Repo%20Size-%3C%201%20MB-blue.svg)](https://github.com/ujju2020/Celebration_Event-Planner)
@@ -269,10 +269,11 @@ Celebration_Event-Planner/
 
 ## 8. Security, Guardrails & Accessibility
 
-* **PII Redaction:** Automatically detects and redacts emails, telephone numbers, credit cards, and government IDs.
-* **Prompt Injection Defense:** Defends against unauthorized system instruction overrides and malicious script tags.
-* **Input Boundary Sanitization:** Restricts extreme budgets and guest counts to realistic parameters.
-* **Accessibility (WCAG 2.1 AA):** High contrast color ratios, semantic HTML5 tags, full keyboard navigation, and responsive scaling.
+* **Defense-in-Depth PII Redaction (`src/safety/guardrails.ts`):** Automatically redacts emails, telephone numbers, credit cards, SSN, Indian Aadhaar, and Indian PAN cards (`[A-Z]{5}[0-9]{4}[A-Z]{1}`) across all inputs, requests, and copilot dialogues.
+* **Adversarial Prompt Injection Defense:** Proactively neutralizes jailbreaks, instruction overrides (e.g. "ignore previous instructions", "developer mode", "DAN mode"), and SQL injection attempts (`UNION SELECT`, `DROP TABLE`).
+* **DOM Cross-Site Scripting (XSS) Sanitization:** Strict HTML entity encoding (`escapeHtml`) on all user-submitted and copilot-rendered content.
+* **Input Boundary Sanitization:** Restricts extreme budgets and guest counts to realistic parameters while throwing typed domain exceptions (`BudgetOutOfBoundsError`, `GuardrailViolationError`).
+* **WCAG 2.1 AA Accessibility:** Full WAI-ARIA tab semantics (`role="tablist"`, `role="tab"`, `aria-selected`, `aria-controls`, `role="tabpanel"`), semantic HTML5 landmarks, high-contrast palette compliance, and dynamic screen-reader alerts via `aria-live="polite"`.
 
 ---
 
@@ -285,24 +286,24 @@ All business logic, caching algorithms, architectural patterns, and security gua
 -------------------|---------|----------|---------|---------|-------------------
 File               | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s 
 -------------------|---------|----------|---------|---------|-------------------
-All files          |     100 |    91.91 |     100 |     100 |                   
+All files          |     100 |     92.3 |     100 |     100 |                   
  src               |     100 |      100 |     100 |     100 |                   
   index.ts         |     100 |      100 |     100 |     100 |                   
  src/ai            |     100 |      100 |     100 |     100 |                   
   provider.ts      |     100 |      100 |     100 |     100 |                   
  src/builder       |     100 |      100 |     100 |     100 |                   
   event-builder.ts |     100 |      100 |     100 |     100 |                   
- src/engine        |     100 |     89.7 |     100 |     100 |                   
+ src/engine        |     100 |    89.85 |     100 |     100 |                   
   ...-allocator.ts |     100 |    91.17 |     100 |     100 | 112,119,193       
-  event-copilot.ts |     100 |    82.85 |     100 |     100 | 37,41-43,77       
+  event-copilot.ts |     100 |    83.78 |     100 |     100 | 53,57-59,93       
   memoizer.ts      |     100 |      100 |     100 |     100 |                   
   theme-ideator.ts |     100 |    96.15 |     100 |     100 | 20                
   ...-generator.ts |     100 |      100 |     100 |     100 |                   
   ...or-manager.ts |     100 |       20 |     100 |     100 | 19-75             
  src/errors        |     100 |      100 |     100 |     100 |                   
   index.ts         |     100 |      100 |     100 |     100 |                   
- src/safety        |     100 |     91.3 |     100 |     100 |                   
-  guardrails.ts    |     100 |     91.3 |     100 |     100 | 90,132            
+ src/safety        |     100 |     92.3 |     100 |     100 |                   
+  guardrails.ts    |     100 |     92.3 |     100 |     100 | 119,161           
  src/types         |       0 |        0 |       0 |       0 |                   
   index.ts         |       0 |        0 |       0 |       0 |                   
 -------------------|---------|----------|---------|---------|-------------------

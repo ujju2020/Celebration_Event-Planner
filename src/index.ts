@@ -22,6 +22,7 @@ import { EventRequest, PlannerDossier } from './types/index.js';
 import { CelebraTechAIProvider } from './ai/provider.js';
 import { EventCopilot, CopilotResponse } from './engine/event-copilot.js';
 import { PlannerStateError } from './errors/index.js';
+import { EventRequestBuilder } from './builder/event-builder.js';
 
 export class CelebraTechPlanner {
   private provider: CelebraTechAIProvider;
@@ -54,6 +55,25 @@ export class CelebraTechPlanner {
    */
   public getDossier(): PlannerDossier | null {
     return this.currentDossier;
+  }
+}
+
+/**
+ * Enterprise Factory Pattern for creating CelebraTech planning agents and builders.
+ */
+export class CelebraTechFactory {
+  /**
+   * Creates a new CelebraTechPlanner orchestrator instance.
+   */
+  public static createPlanner(apiKey?: string): CelebraTechPlanner {
+    return new CelebraTechPlanner(apiKey);
+  }
+
+  /**
+   * Creates a new fluent EventRequestBuilder.
+   */
+  public static createBuilder(): EventRequestBuilder {
+    return new EventRequestBuilder();
   }
 }
 

@@ -9,6 +9,7 @@
 
 import { PlannerDossier } from '../types/index.js';
 import { Memoizer, CacheStats } from './memoizer.js';
+import { SafetyGuardrails } from '../safety/guardrails.js';
 
 export interface CopilotResponse {
   answer: string;
@@ -33,7 +34,22 @@ export class EventCopilot {
    * const response = EventCopilot.processQuery('Our guest count increased to 250', dossier);
    */
   public static processQuery(query: string, dossier: PlannerDossier): CopilotResponse {
-    const q = query.toLowerCase().trim();
+    // Security Guardrail: Check and intercept adversarial prompt injection
+    const injection = SafetyGuardrails.checkPromptInjection(query);
+    if (injection.hasInjection) {
+      return {
+        answer: `🛡️ Security Alert: Malicious prompt injection pattern detected (${injection.detectedPatterns.join(', ')}). Query blocked by CelebraTech AI Safety Shield.`,
+        suggestedAction: 'Please rephrase your query without system override instructions.',
+        suggestedFollowUps: [
+          'How can we optimize our budget?',
+          'What should we do if guest count changes?',
+          'Show me the Day-Of Run of Show'
+        ]
+      };
+    }
+
+    const piiRedacted = SafetyGuardrails.redactPII(query).redactedText;
+    const q = piiRedacted.toLowerCase().trim();
     const dossierId = dossier.metadata.id || 'default';
     const cacheKey = `${dossierId}:${dossier.request.guestCount}:${dossier.request.totalBudget}:${q}`;
 

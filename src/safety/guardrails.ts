@@ -21,17 +21,41 @@ export class SafetyGuardrails {
   private static readonly PHONE_REGEX = /(\+?\d{1,3}[-.\s]?)?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}/g;
   private static readonly CREDIT_CARD_REGEX = /\b(?:\d{4}[-\s]?){3}\d{4}\b/g;
   private static readonly SSN_OR_GOV_ID = /\b\d{3}-\d{2}-\d{4}\b|\b\d{4}\s\d{4}\s\d{4}\b/g;
+  private static readonly PAN_CARD_REGEX = /\b[A-Z]{5}[0-9]{4}[A-Z]{1}\b/g;
 
-  // Prompt injection signatures
+  // Prompt injection signatures & malicious payloads
   private static readonly INJECTION_PATTERNS = [
-    /ignore\s+(all\s+)?(previous|prior)\s+instructions/i,
+    /ignore\s+(all\s+)?(previous|prior)\s+(instructions|prompts|directives)/i,
+    /disregard\s+(all\s+)?(previous|prior)\s+(instructions|prompts|directives)/i,
     /system\s+prompt/i,
+    /reveal\s+(system|hidden|initial)\s+(prompt|instructions)/i,
     /you\s+are\s+now\s+in\s+developer\s+mode/i,
     /jailbreak/i,
+    /dan\s+mode/i,
     /<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi,
     /javascript:/i,
-    /drop\s+table/i
+    /<iframe\b/i,
+    /<img\s+[^>]*onerror/i,
+    /onload\s*=/i,
+    /drop\s+table/i,
+    /union\s+select/i,
+    /exec\s*\(/i,
+    /__proto__/i
   ];
+
+  /**
+   * Encodes HTML entities to protect against DOM Cross-Site Scripting (XSS).
+   * @param text Raw unencoded text
+   * @returns Sanitized HTML-safe string
+   */
+  public static escapeHtml(text: string): string {
+    return text
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#039;');
+  }
 
   /**
    * Redacts sensitive personally identifiable information (PII)
@@ -39,13 +63,18 @@ export class SafetyGuardrails {
   public static redactPII(text: string): { redactedText: string; foundItems: string[] } {
     const foundItems: string[] = [];
 
-    let cleaned = text.replace(this.CREDIT_CARD_REGEX, (match) => {
+    let cleaned = text.replace(this.CREDIT_CARD_REGEX, () => {
       foundItems.push(`Credit Card: [REDACTED]`);
       return '[PAYMENT_INFO_REDACTED]';
     });
 
-    cleaned = cleaned.replace(this.SSN_OR_GOV_ID, (match) => {
+    cleaned = cleaned.replace(this.SSN_OR_GOV_ID, () => {
       foundItems.push(`Gov ID/Aadhaar: [REDACTED]`);
+      return '[GOV_ID_REDACTED]';
+    });
+
+    cleaned = cleaned.replace(this.PAN_CARD_REGEX, (match) => {
+      foundItems.push(`PAN Card: ${match}`);
       return '[GOV_ID_REDACTED]';
     });
 

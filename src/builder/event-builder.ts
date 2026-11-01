@@ -7,7 +7,8 @@
  */
 
 import { EventRequest, EventType, VibeType } from '../types/index.js';
-import { ValidationError, BudgetOutOfBoundsError } from '../errors/index.js';
+import { ValidationError, BudgetOutOfBoundsError, GuardrailViolationError } from '../errors/index.js';
+import { SafetyGuardrails } from '../safety/guardrails.js';
 
 export interface IEventRequestBuilder {
   setEventType(type: EventType): this;
@@ -50,7 +51,11 @@ export class EventRequestBuilder implements IEventRequestBuilder {
     if (!title || title.trim().length === 0) {
       throw new ValidationError('title', 'Event title cannot be empty.');
     }
-    this.title = title.trim();
+    const injection = SafetyGuardrails.checkPromptInjection(title);
+    if (injection.hasInjection) {
+      throw new GuardrailViolationError(injection.detectedPatterns, 'Prompt injection detected in event title');
+    }
+    this.title = SafetyGuardrails.redactPII(title.trim()).redactedText;
     return this;
   }
 
@@ -83,7 +88,11 @@ export class EventRequestBuilder implements IEventRequestBuilder {
     if (!location || location.trim().length === 0) {
       throw new ValidationError('location', 'Location cannot be empty.');
     }
-    this.location = location.trim();
+    const injection = SafetyGuardrails.checkPromptInjection(location);
+    if (injection.hasInjection) {
+      throw new GuardrailViolationError(injection.detectedPatterns, 'Prompt injection detected in location');
+    }
+    this.location = SafetyGuardrails.redactPII(location.trim()).redactedText;
     return this;
   }
 
@@ -93,16 +102,20 @@ export class EventRequestBuilder implements IEventRequestBuilder {
   }
 
   public setCustomNotes(notes: string): this {
-    this.customVibeNotes = notes.trim();
+    const injection = SafetyGuardrails.checkPromptInjection(notes);
+    if (injection.hasInjection) {
+      throw new GuardrailViolationError(injection.detectedPatterns, 'Prompt injection detected in custom notes');
+    }
+    this.customVibeNotes = SafetyGuardrails.redactPII(notes.trim()).redactedText;
     return this;
   }
 
   /**
-   * Finalizes and builds the immutable EventRequest object.
+   * Finalizes and builds the immutable, guardrail-sanitized EventRequest object.
    * @returns Complete validated EventRequest
    */
   public build(): EventRequest {
-    return {
+    const raw: EventRequest = {
       eventType: this.eventType,
       title: this.title,
       totalBudget: this.totalBudget,
@@ -113,6 +126,9 @@ export class EventRequestBuilder implements IEventRequestBuilder {
       vibe: this.vibe,
       customVibeNotes: this.customVibeNotes
     };
+
+    const sanitized = SafetyGuardrails.sanitizeAndValidate(raw);
+    return sanitized.sanitizedRequest;
   }
 }
 

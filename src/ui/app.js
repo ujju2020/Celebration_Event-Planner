@@ -135,10 +135,14 @@ function loadPreset(preset) {
 // Tab Switching
 document.querySelectorAll('.tab-btn').forEach(btn => {
   btn.addEventListener('click', () => {
-    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b => {
+      b.classList.remove('active');
+      b.setAttribute('aria-selected', 'false');
+    });
     document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
 
     btn.classList.add('active');
+    btn.setAttribute('aria-selected', 'true');
     const targetPane = document.getElementById(btn.dataset.tab);
     if (targetPane) {
       targetPane.classList.add('active');
@@ -218,10 +222,25 @@ function handleChatSubmit() {
   }, 350);
 }
 
+// HTML Entity Encoding for XSS Defense
+function escapeHtml(str) {
+  if (typeof str !== 'string') return '';
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
 function appendChatMessage(sender, text) {
   const bubble = document.createElement('div');
   bubble.className = `chat-bubble bubble-${sender}`;
-  bubble.innerHTML = text.replace(/\n/g, '<br>');
+  if (sender === 'user') {
+    bubble.textContent = text;
+  } else {
+    bubble.innerHTML = escapeHtml(text).replace(/\n/g, '<br>');
+  }
   chatHistory.appendChild(bubble);
   chatHistory.scrollTop = chatHistory.scrollHeight;
 }
@@ -521,6 +540,26 @@ function generateThemeClient(req) {
 
 function processCopilotQuery(q) {
   const lower = q.toLowerCase();
+
+  // Security Guardrail: Prompt injection defense
+  const injectionPatterns = [
+    /ignore\s+(all\s+)?(previous|prior)\s+instructions/i,
+    /disregard\s+(all\s+)?(previous|prior)\s+instructions/i,
+    /system\s+prompt/i,
+    /developer\s+mode/i,
+    /jailbreak/i,
+    /dan\s+mode/i,
+    /<script/i,
+    /javascript:/i,
+    /drop\s+table/i,
+    /union\s+select/i
+  ];
+  if (injectionPatterns.some(p => p.test(q))) {
+    return {
+      answer: '🛡️ Security Shield Active: Malicious prompt injection pattern detected and neutralized. Please rephrase with standard event planning questions.',
+      suggestedFollowUps: ['How can we optimize our budget?', 'What should we do if guest count changes?']
+    };
+  }
 
   // Guest count changes
   const countMatch = lower.match(/(\d+)\s+guest/i) || lower.match(/to\s+(\d+)/i);
