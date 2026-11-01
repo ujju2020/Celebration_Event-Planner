@@ -4,22 +4,31 @@
  * All rights reserved.
  * 
  * Dynamic Budget Allocator Engine for CelebraTech AI
- * Implements benchmarked allocation models, contingency reserves, and cost-per-guest analytics.
+ * Features Strategy Pattern, O(1) Memoization Caching, and Real-time Analytics.
  */
 
 import { EventRequest, EventType, BudgetBreakdown, BudgetItem, PriorityLevel } from '../types/index.js';
+import { Memoizer, CacheStats } from './memoizer.js';
 
-interface AllocationRule {
-  category: string;
-  name: string;
-  percentage: number;
-  priority: PriorityLevel;
-  notes: string;
+export interface AllocationRule {
+  readonly category: string;
+  readonly name: string;
+  readonly percentage: number;
+  readonly priority: PriorityLevel;
+  readonly notes: string;
 }
 
-export class BudgetAllocator {
-  // Standard benchmark allocation tables per event vertical
-  private static readonly WEDDING_RULES: AllocationRule[] = [
+/**
+ * Strategy interface for vertical-specific budget distribution models.
+ */
+export interface IBudgetAllocationStrategy {
+  readonly eventType: EventType;
+  readonly rules: readonly AllocationRule[];
+}
+
+export class WeddingAllocationStrategy implements IBudgetAllocationStrategy {
+  public readonly eventType: EventType = 'wedding';
+  public readonly rules: readonly AllocationRule[] = [
     { category: 'Catering & Drinks', name: 'Multi-course Dining, Hors d’oeuvres & Bar', percentage: 32, priority: 'essential', notes: 'Primary guest hospitality experience' },
     { category: 'Venue & Rentals', name: 'Ceremony & Reception Space with Furniture', percentage: 22, priority: 'essential', notes: 'Core location booking and basic layout' },
     { category: 'Photo & Video', name: 'Full-day Coverage, Drone, & Cinematic Film', percentage: 12, priority: 'essential', notes: 'Preserving lifelong memories' },
@@ -29,8 +38,11 @@ export class BudgetAllocator {
     { category: 'Invitations & Gifts', name: 'Digital & Print Invites, Guest Favors', percentage: 2, priority: 'optional', notes: 'Keepsakes and welcome hampers' },
     { category: 'Emergency Contingency', name: 'Unexpected Overages & Tip Buffer', percentage: 8, priority: 'essential', notes: 'Mandatory buffer for last-minute adjustments' }
   ];
+}
 
-  private static readonly BIRTHDAY_RULES: AllocationRule[] = [
+export class BirthdayAllocationStrategy implements IBudgetAllocationStrategy {
+  public readonly eventType: EventType = 'birthday';
+  public readonly rules: readonly AllocationRule[] = [
     { category: 'Food & Refreshments', name: 'Buffet/Bites, Signature Drinks & Master Cake', percentage: 38, priority: 'essential', notes: 'Gourmet meal, snacks and customized cake' },
     { category: 'Venue / Party Hall', name: 'Private Room, Lounge or Outdoor Lawn', percentage: 20, priority: 'essential', notes: 'Exclusive party space and setup' },
     { category: 'Entertainment & DJ', name: 'DJ, Party Host/Emcee & Fun Activities/Games', percentage: 14, priority: 'recommended', notes: 'Interactive activities and music' },
@@ -39,8 +51,11 @@ export class BudgetAllocator {
     { category: 'Invites & Favors', name: 'Custom Return Gifts & Digital Invites', percentage: 3, priority: 'optional', notes: 'Personalized souvenirs for attendees' },
     { category: 'Emergency Contingency', name: 'Spontaneous Add-ons & Extra Guests Buffer', percentage: 7, priority: 'essential', notes: 'Buffer for walk-ins or extra hours' }
   ];
+}
 
-  private static readonly COMMUNITY_RULES: AllocationRule[] = [
+export class CommunityAllocationStrategy implements IBudgetAllocationStrategy {
+  public readonly eventType: EventType = 'community';
+  public readonly rules: readonly AllocationRule[] = [
     { category: 'Catering & Food Stalls', name: 'Community Meals, Refreshment Kiosks & Water', percentage: 26, priority: 'essential', notes: 'Mass catering or vendor logistics' },
     { category: 'Stage, Sound & AV', name: 'Main Stage, Professional Line Array Sound & Screens', percentage: 22, priority: 'essential', notes: 'Acoustics, mics, amplifiers and projection' },
     { category: 'Permits & Security', name: 'Municipal Permissions, Private Security, First Aid & Sanitation', percentage: 18, priority: 'essential', notes: 'Legal compliance, crowd management & restrooms' },
@@ -48,75 +63,122 @@ export class BudgetAllocator {
     { category: 'Artists & Speakers', name: 'Guest Performers, Honorariums & Accommodations', percentage: 12, priority: 'recommended', notes: 'Headline acts and cultural troupes' },
     { category: 'Emergency Contingency', name: 'Weather Protection & Incident Reserve', percentage: 10, priority: 'essential', notes: 'Crucial for large gathering risk mitigation' }
   ];
+}
+
+/**
+ * High-performance budget allocation engine with constant-time O(1) caching.
+ */
+export class BudgetAllocator {
+  // O(1) Memoization cache for calculated budgets
+  private static readonly cache = new Memoizer<string, BudgetBreakdown>(256);
+
+  // Strategy Registry indexed by EventType for O(1) lookup
+  private static readonly strategies = new Map<EventType, IBudgetAllocationStrategy>([
+    ['wedding', new WeddingAllocationStrategy()],
+    ['birthday', new BirthdayAllocationStrategy()],
+    ['community', new CommunityAllocationStrategy()]
+  ]);
 
   /**
-   * Generates a fully calculated budget breakdown
+   * Registers or replaces an allocation strategy for a specific event type.
    */
-  public static calculateBudget(request: EventRequest): BudgetBreakdown {
-    const rules = this.getRulesForEvent(request.eventType);
-    const totalBudget = request.totalBudget;
-    const guestCount = Math.max(1, request.guestCount);
-
-    const items: BudgetItem[] = [];
-    let contingencyAmount = 0;
-    let contingencyPercentage = 0;
-    let totalAllocated = 0;
-
-    for (const rule of rules) {
-      const allocated = Math.round((totalBudget * rule.percentage) / 100);
-      const costPerGuest = parseFloat((allocated / guestCount).toFixed(2));
-      totalAllocated += allocated;
-
-      if (rule.category.toLowerCase().includes('contingency')) {
-        contingencyAmount = allocated;
-        contingencyPercentage = rule.percentage;
-      }
-
-      items.push({
-        category: rule.category,
-        name: rule.name,
-        allocatedAmount: allocated,
-        percentage: rule.percentage,
-        priority: rule.priority,
-        notes: rule.notes,
-        costPerGuest
-      });
-    }
-
-    // Cost per guest total
-    const costPerGuestTotal = parseFloat((totalBudget / guestCount).toFixed(2));
-
-    const currency = request.currency || 'INR';
-
-    // Intelligence: Analyze warnings and savings
-    const overspendWarnings = this.generateWarnings(request.eventType, totalBudget, guestCount, items, currency);
-    const savingsRecommendations = this.generateSavings(request.eventType, items);
-
-    return {
-      totalBudget,
-      currency,
-      guestCount,
-      contingencyAmount,
-      contingencyPercentage,
-      totalAllocated,
-      costPerGuestTotal,
-      items,
-      overspendWarnings,
-      savingsRecommendations
-    };
+  public static registerStrategy(type: EventType, strategy: IBudgetAllocationStrategy): void {
+    this.strategies.set(type, strategy);
+    this.cache.clear();
   }
 
-  private static getRulesForEvent(eventType: EventType): AllocationRule[] {
-    switch (eventType) {
-      case 'wedding':
-        return this.WEDDING_RULES;
-      case 'birthday':
-        return this.BIRTHDAY_RULES;
-      case 'community':
-        return this.COMMUNITY_RULES;
-      default:
-        return this.WEDDING_RULES;
-    }
+  /**
+   * Alias for calculateBudget.
+   */
+  public static allocate(request: EventRequest): BudgetBreakdown {
+    return this.calculateBudget(request);
+  }
+
+  /**
+   * Generates a fully calculated budget breakdown with O(1) memoization caching.
+   * @param request Validated event parameters
+   * @returns Complete calculated BudgetBreakdown
+   * @example
+   * const budget = BudgetAllocator.calculateBudget({
+   *   eventType: 'wedding',
+   *   totalBudget: 1500000,
+   *   currency: 'INR',
+   *   guestCount: 200, ...
+   * });
+   */
+  public static calculateBudget(request: EventRequest): BudgetBreakdown {
+    const totalBudget = request.totalBudget;
+    const guestCount = Math.max(1, request.guestCount);
+    const currency = request.currency || 'INR';
+    const eventType = request.eventType;
+
+    // Cache key for sub-millisecond retrieval
+    const cacheKey = `${eventType}:${totalBudget}:${guestCount}:${currency}`;
+
+    return this.cache.getOrCompute(cacheKey, () => {
+      const strategy = this.strategies.get(eventType) || this.strategies.get('wedding')!;
+      const rules = strategy.rules;
+
+      const items: BudgetItem[] = [];
+      let contingencyAmount = 0;
+      let contingencyPercentage = 0;
+      let totalAllocated = 0;
+
+      for (const rule of rules) {
+        const allocated = Math.round((totalBudget * rule.percentage) / 100);
+        const costPerGuest = parseFloat((allocated / guestCount).toFixed(2));
+        totalAllocated += allocated;
+
+        if (rule.category.toLowerCase().includes('contingency')) {
+          contingencyAmount = allocated;
+          contingencyPercentage = rule.percentage;
+        }
+
+        items.push({
+          category: rule.category,
+          name: rule.name,
+          allocatedAmount: allocated,
+          percentage: rule.percentage,
+          priority: rule.priority,
+          notes: rule.notes,
+          costPerGuest
+        });
+      }
+
+      // Cost per guest total
+      const costPerGuestTotal = parseFloat((totalBudget / guestCount).toFixed(2));
+
+      // Intelligence: Analyze warnings and savings
+      const overspendWarnings = this.generateWarnings(eventType, totalBudget, guestCount, items, currency);
+      const savingsRecommendations = this.generateSavings(eventType, items);
+
+      return {
+        totalBudget,
+        currency,
+        guestCount,
+        contingencyAmount,
+        contingencyPercentage,
+        totalAllocated,
+        costPerGuestTotal,
+        items,
+        overspendWarnings,
+        savingsRecommendations
+      };
+    });
+  }
+
+  /**
+   * Returns live memoization cache statistics.
+   */
+  public static getCacheStats(): CacheStats {
+    return this.cache.getStats();
+  }
+
+  /**
+   * Clears the internal budget cache.
+   */
+  public static clearCache(): void {
+    this.cache.clear();
   }
 
   private static generateWarnings(
@@ -166,4 +228,3 @@ export class BudgetAllocator {
     return recommendations;
   }
 }
-

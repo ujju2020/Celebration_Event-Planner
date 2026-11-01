@@ -7,7 +7,10 @@
  */
 
 export * from './types/index.js';
+export * from './errors/index.js';
 export * from './safety/guardrails.js';
+export * from './engine/memoizer.js';
+export * from './builder/event-builder.js';
 export * from './engine/budget-allocator.js';
 export * from './engine/timeline-generator.js';
 export * from './engine/vendor-manager.js';
@@ -18,6 +21,7 @@ export * from './ai/provider.js';
 import { EventRequest, PlannerDossier } from './types/index.js';
 import { CelebraTechAIProvider } from './ai/provider.js';
 import { EventCopilot, CopilotResponse } from './engine/event-copilot.js';
+import { PlannerStateError } from './errors/index.js';
 
 export class CelebraTechPlanner {
   private provider: CelebraTechAIProvider;
@@ -40,7 +44,7 @@ export class CelebraTechPlanner {
    */
   public askCopilot(query: string): CopilotResponse {
     if (!this.currentDossier) {
-      throw new Error('No active event plan found. Please call planEvent() first.');
+      throw new PlannerStateError('No active event plan found. Please call planEvent() first.');
     }
     return EventCopilot.processQuery(query, this.currentDossier);
   }
