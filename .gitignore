@@ -31,3 +31,10 @@ Thumbs.db
 npm-debug.log*
 yarn-debug.log*
 
+# Media & Reel Generation Builds
+reel_build_assets/
+*.mp4
+*.wav
+*.avi
+*.mkv
+
