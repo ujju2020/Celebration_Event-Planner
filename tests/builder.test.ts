@@ -78,3 +78,4 @@ describe('EventRequestBuilder (Builder Pattern)', () => {
     expect(() => builder.setLocation('  ')).toThrow(ValidationError);
   });
 });
+
